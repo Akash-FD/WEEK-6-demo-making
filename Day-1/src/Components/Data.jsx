@@ -7,15 +7,18 @@ import axios from 'axios'
 import SingleData from './SingleData'
 // import './Data.css'
 
-const Data = () => {
+const Data = (props) => {
     const [search, setSearch] = useState(false)
     const [searching, setSearching] = useState("")
-    const [allData, setAllData] = useState([])
+    const [filterData, setFilterData] = useState([])
     const [page, setPage] = useState(1)
-    const [singleDetail , setSingleDetail] = useState({})
+    const [singleDetail, setSingleDetail] = useState({})
     const limit = 10;
+    console.log(props.select);
+    console.log(filterData);
+    
 
-    // console.log(singleDetail);
+
 
     const handleSearch = () => {
         if (search) setSearch(false)
@@ -25,12 +28,25 @@ const Data = () => {
     useEffect(() => {
         const fetchData = async () => {
             const { data } = await axios.get('https://api.spacexdata.com/v3/launches')
-            setAllData(data)
+            if (props.select === "Successful") {
+                setFilterData(data.filter((item) => item.launch_success === true && item.upcoming === false))
+            }
+            else if (props.select === "failed") {
+                setFilterData(data.filter((item) => item.launch_success === false && item.upcoming === false))
+            }
+            else if (props.select === "Upcoming") {
+                setFilterData(data.filter((item) => item.upcoming === true))
+
+            } else {
+                setFilterData(data)
+            }
         }
         fetchData()
-    }, [])
+    }, [props.select])
 
-    const paginateData = allData.slice((page - 1) * limit, page * limit)
+
+
+    const paginateData = filterData.slice((page - 1) * limit, page * limit)
 
     return (
         <div className="border border-gray-300 shadow-md rounded-md">
@@ -73,8 +89,8 @@ const Data = () => {
 
                     <tbody>
                         {searching.length > 0 ?
-                            allData.filter((item) => { return searching.toLowerCase() === "" ? item : item.launch_site.site_name.toLowerCase().startsWith(searching) }).map((item, index) => {
-                                return <tr key={index} className='text-sm border-b cursor-pointer' onClick={()=>setSingleDetail(item)}>
+                            filterData.filter((item) => { return searching.toLowerCase() === "" ? item : item.launch_site.site_name.toLowerCase().startsWith(searching) }).map((item, index) => {
+                                return <tr key={index} className='text-sm border-b cursor-pointer' onClick={() => setSingleDetail(item)}>
                                     <td className='font-normal p-3'>{item.flight_number}</td>
                                     <td className='font-normal p-3'>{item.launch_date_utc}</td>
                                     <td className='font-normal p-3'>{item.launch_site.site_name}</td>
@@ -86,13 +102,13 @@ const Data = () => {
                             })
                             :
                             paginateData.map((item, index) => {
-                                return <tr key={index} className='text-sm border-b cursor-pointer' onClick={()=>setSingleDetail(item)}>
+                                return <tr key={index} className='text-sm border-b cursor-pointer' onClick={() => setSingleDetail(item)}>
                                     <td className='font-normal p-3'>{item.flight_number}</td>
                                     <td className='font-normal p-3'>{item.launch_date_utc}</td>
                                     <td className='font-normal p-3'>{item.launch_site.site_name}</td>
                                     <td className='font-normal p-3'>{item.mission_name}</td>
                                     <td className='font-normal p-3'>{item.rocket.second_stage.payloads[0].orbit}</td>
-                                    <td className='font-normal p-3'>{item.launch_success === true ? <button className='bg-green-600 w-20 text-white px-3 py-1 rounded-xl'>success</button> : <button className='bg-red-600 w-20 text-white px-3 py-1 rounded-xl'>failed</button>}</td>
+                                    <td className='font-normal p-3'>{item.upcoming === false ? (item.launch_success === true ? <button className='bg-green-600 w-20 text-white px-3 py-1 rounded-xl'>success</button> : <button className='bg-red-600 w-20 text-white px-3 py-1 rounded-xl'>failed</button>) : <button className='bg-yellow-600 w-20 text-white px-3 py-1 rounded-xl'>upcoming</button>}</td>
                                     <td className='font-normal p-3'>{item.rocket.rocket_name}</td>
                                 </tr>
                             })
@@ -100,15 +116,15 @@ const Data = () => {
 
                     </tbody>
                 </table>
-               {searching.length === 0 && <div className='text-4xl flex gap-4 justify-end my-8'>
+                {searching.length === 0 && <div className='text-4xl flex gap-4 justify-end my-8'>
                     <button disabled={page === 1} onClick={() => setPage(page - 1)} className='hover:text-red-600'><IoMdArrowDropleftCircle /></button>
                     <p>{page}</p>
-                    <button disabled={page * limit >= allData.length} onClick={() => setPage(page + 1)} className='hover:text-red-600'><IoMdArrowDroprightCircle /></button>
+                    <button disabled={page * limit >= filterData.length} onClick={() => setPage(page + 1)} className='hover:text-red-600'><IoMdArrowDroprightCircle /></button>
                 </div>}
 
                 {
-                    Object.keys(singleDetail).length > 0 ? <SingleData singleDetail={singleDetail}/> : console.log(singleDetail)
-                    
+                    Object.keys(singleDetail).length > 0 && <SingleData singleDetail={singleDetail} />
+
                 }
 
             </div>

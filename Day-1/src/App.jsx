@@ -1,37 +1,23 @@
-import './App.css'
-import Data from './Components/Data'
+import React from 'react'
+import SignUp from './Components/SignUp'
+import Login from './Components/Login'
+import Home from './Home'
+import ProtectedRoute from './Components/ProtectedRoute'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
-function App() {
+const App = () => {
+    return (
+        <>
+            <BrowserRouter>
+                <Routes>
+                    <Route path='/' element={<SignUp />}></Route>
+                    <Route path='/login' element={<Login />}></Route>
+                    <Route path='/home' element={<ProtectedRoute> <Home /> </ProtectedRoute>}></Route>
 
-  return (
-    <>
-      <div className='mx-3'>
-
-        <div className="logo border border-gray-300 my-2 flex justify-center shadow-md rounded-md">
-          <img src="../image/logo.png" alt="spacex logo" width={500} />
-        </div>
-
-        <div className='flex justify-around items-center mx-20'>
-
-          <select name="" id="" className='p-3 border bg-white'>
-            <option value="" >Past 6 Months</option>
-            <option value="">Last 6 Months</option>
-          </select>
-
-          <select name="" id="" className='p-3 border bg-white'>
-            <option value="">All Launches</option>
-            <option value="">Upcoming Launches</option>
-            <option value="">Successful Launches</option>
-            <option value="">Failed Launches</option>
-          </select>
-
-        </div>
-        <p className='text-center mt-2'>Click on record to see details</p>
-        <Data/>
-      </div>
-
-    </>
-  )
+                </Routes>
+            </BrowserRouter>
+        </>
+    )
 }
 
 export default App
