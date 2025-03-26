@@ -1,0 +1,17 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  /* border: 1px solid red; */
+}
+body{
+  background-color: rgb(199, 148, 148);
+}
+.dark-mode{
+  background-color: #242424;
+
+}
+
+
+
+
